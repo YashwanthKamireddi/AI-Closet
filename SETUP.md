@@ -29,6 +29,28 @@ The following environment variables need to be set:
 - `PGHOST`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`, `PGPORT`: PostgreSQL credentials
 - `OPENAI_API_KEY`: Your OpenAI API key (optional, but required for AI features)
 
+#### Setting Up Environment Variables
+
+We provide several helper scripts to make setting up environment variables easy:
+
+1. **Environment Configuration Generator:**
+   ```
+   node scripts/create-env.js
+   ```
+   This interactive script will guide you through creating a `.env` file with the correct format.
+
+2. **Quick Setup with Default Values:**
+   ```
+   node scripts/create-env.js --default
+   ```
+   This will create a `.env` file with default values for quick setup.
+
+3. **Interactive Setup & Run:**
+   ```
+   node start-local.js
+   ```
+   This comprehensive script will guide you through the entire setup process and start the application.
+
 ### Running on Replit
 
 1. The application is configured to run automatically on Replit

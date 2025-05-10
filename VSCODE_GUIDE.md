@@ -77,6 +77,24 @@ If you prefer using the command line, you can:
 
 ## 5. Setting Up Environment Variables
 
+### Option 1: Using the Environment Configuration Generator (Recommended)
+
+1. In the VS Code terminal, run:
+   ```
+   node scripts/create-env.js
+   ```
+2. Follow the prompts to create your `.env` file:
+   - Enter your PostgreSQL connection details
+   - Optionally add an OpenAI API key for AI features
+   - The script will create the `.env` file with the correct format
+
+3. To use default values (for quick setup), you can run:
+   ```
+   node scripts/create-env.js --default
+   ```
+
+### Option 2: Manual Creation
+
 1. In VS Code, create a new file in the root of the project:
    - Right-click in the Explorer panel
    - Select "New File"

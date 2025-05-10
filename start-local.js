@@ -155,6 +155,29 @@ OPENAI_API_KEY=
     process.exit(1);
   }
   
+  // Verify database connection is fully working
+  log("Verifying database connection...");
+  try {
+    const dbCheckSuccess = await checkDatabase();
+    if (!dbCheckSuccess) {
+      const continueAnyway = await ask("Would you like to continue starting the app anyway? (y/n): ");
+      if (continueAnyway.toLowerCase() !== 'y') {
+        log("Exiting. Please fix the database issues and try again.", 'warning');
+        rl.close();
+        return;
+      }
+      log("Continuing despite database issues - the application may not work correctly.", 'warning');
+    }
+  } catch (error) {
+    log("Database verification failed: " + error.message, 'error');
+    const continueAnyway = await ask("Would you like to continue anyway? (y/n): ");
+    if (continueAnyway.toLowerCase() !== 'y') {
+      log("Exiting. Please fix the database issues and try again.", 'warning');
+      rl.close();
+      return;
+    }
+  }
+  
   // Start the development server
   log("Starting development server...", 'success');
   const devProcess = spawn('npm', ['run', 'dev'], { stdio: 'inherit' });
