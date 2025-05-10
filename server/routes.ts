@@ -9,12 +9,7 @@ import {
   insertWeatherPreferenceSchema, 
   insertMoodPreferenceSchema 
 } from "@shared/schema";
-import { 
-  generateAdvancedOutfitRecommendations, 
-  getOutfitSuggestionForOccasion, 
-  createUserStyleProfile,
-  analyzeStyle
-} from "./services/ai-service";
+import aiService from "./services/ai-service";
 
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -500,12 +495,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       try {
         // First try AI-based recommendations
-        const recommendations = await generateAdvancedOutfitRecommendations(
-          mood,
-          weather,
-          occasion || "everyday",
-          wardrobeItems
-        );
+        const recommendations = await aiService.getOutfitRecommendations({
+          wardrobeItems: wardrobeItems,
+          mood: mood,
+          occasion: occasion || "everyday",
+          weatherCondition: weather ? {
+            temperature: weather.temperature,
+            condition: weather.type,
+            humidity: weather.humidity,
+            precipitation: 0 // Not provided in the current weather data
+          } : undefined
+        });
         
         if (recommendations && recommendations.length > 0) {
           return res.json({
@@ -632,7 +632,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Generate style profile
-      const styleProfile = await createUserStyleProfile(wardrobeItems);
+      const styleProfile = await aiService.analyzeUserStyle({
+        wardrobeItems
+      });
       
       res.json(styleProfile);
     } catch (error) {
@@ -671,7 +673,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Generate style analysis
-      const analysis = await analyzeStyle(wardrobeItems);
+      const analysis = await aiService.analyzeUserStyle({
+        wardrobeItems: wardrobeItems
+      });
       
       res.json({
         analysis,
@@ -731,11 +735,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       try {
         // First attempt to generate occasion-specific outfit recommendation using AI
-        const recommendation = await getOutfitSuggestionForOccasion(
-          occasion,
-          wardrobeItems,
-          weather
-        );
+        const recommendation = await aiService.getOccasionOutfit({
+          occasion: occasion,
+          wardrobeItems: wardrobeItems,
+          weatherCondition: weather ? {
+            temperature: weather.temperature,
+            condition: weather.type,
+            humidity: weather.humidity,
+            precipitation: 0
+          } : undefined
+        });
         
         if (recommendation) {
           return res.json({

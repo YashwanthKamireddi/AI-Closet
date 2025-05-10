@@ -5,7 +5,7 @@
  */
 
 import NavigationBar from './navigation-bar';
-import MobileBottomNav from './mobile-bottom-nav';
+import { MobileBottomNav } from './mobile-bottom-nav';
 
 export {
   NavigationBar,

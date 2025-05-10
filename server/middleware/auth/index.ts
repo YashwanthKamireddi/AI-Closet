@@ -8,7 +8,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { User } from '@shared/schema';
-import { ApiError } from '../error-handling/error-types';
+import { ApiError } from '../../middleware/error-handling/error-types';
 import { createLogger } from '../../utils/logger';
 
 const logger = createLogger('auth-middleware');

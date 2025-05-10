@@ -18,7 +18,7 @@ export * from './common';
 export * from './cards';
 
 // Forms
-export { default as UserSettings } from './forms/user-settings';
+export { UserSettings } from './forms/user-settings';
 
 // Re-export UI components for convenience
 export * from './ui/button';
@@ -33,12 +33,9 @@ export * from './ui/dialog';
 export * from './ui/badge';
 export * from './ui/separator';
 export * from './ui/skeleton';
-export * from './ui/avatar';
 export * from './ui/progress';
-export * from './ui/popover';
 export * from './ui/dropdown-menu';
 export * from './ui/checkbox';
-export * from './ui/radio-group';
 export * from './ui/switch';
 export * from './ui/sheet';
 export * from './ui/label';

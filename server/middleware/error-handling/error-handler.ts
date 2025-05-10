@@ -30,12 +30,12 @@ export function asyncHandler(fn: Function) {
  * 
  * Handles different types of errors and returns appropriate responses
  */
-export function errorHandler(err: Error, req: Request, res: Response, _next: NextFunction) {
+export function errorHandler(err: Error | ApiError, req: Request, res: Response, _next: NextFunction) {
   // Log the error
   if (err instanceof ApiError) {
     if (err.statusCode >= 500) {
       logger.error('Server error', { 
-        error: err.message, 
+        message: err.message, 
         stack: err.stack,
         statusCode: err.statusCode,
         path: req.path,
@@ -43,7 +43,7 @@ export function errorHandler(err: Error, req: Request, res: Response, _next: Nex
       });
     } else {
       logger.warn('Client error', { 
-        error: err.message, 
+        message: err.message, 
         statusCode: err.statusCode,
         path: req.path,
         method: req.method
@@ -51,7 +51,7 @@ export function errorHandler(err: Error, req: Request, res: Response, _next: Nex
     }
   } else {
     logger.error('Unhandled error', { 
-      error: err.message, 
+      message: err.message, 
       stack: err.stack,
       path: req.path,
       method: req.method
