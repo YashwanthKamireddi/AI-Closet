@@ -1,46 +1,64 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
+import { Pool } from 'pg';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from "@shared/schema";
 import { sql } from 'drizzle-orm';
 
-// Configure Neon database to use WebSocket for connection
-neonConfig.webSocketConstructor = ws;
+// Determine if we're running in local mode or using Neon Serverless
+const isLocal = !process.env.REPL_ID;
 
-// Add additional configuration for better stability
-neonConfig.useSecureWebSocket = true;
-
-// Optional configuration that has type constraints
-// Neon pipelineTLS only accepts false or "password"
-// neonConfig.pipelineTLS = false; 
-// neonConfig.pipelineConnect = false;
-
-// Environment validation
+// Environment validation adjusted for local development
 function validateDbEnvironment() {
-  const requiredVars = ['DATABASE_URL', 'PGHOST', 'PGUSER', 'PGDATABASE'];
-  const missing = requiredVars.filter(name => !process.env[name]);
-  
-  if (missing.length > 0) {
-    throw new Error(
-      `Missing required database environment variables: ${missing.join(', ')}. Did you forget to provision a database?`
-    );
+  // Only require DATABASE_URL for local development
+  if (isLocal) {
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL environment variable is required. Please check your .env file.');
+    }
+  } else {
+    // For Replit, require full set of variables
+    const requiredVars = ['DATABASE_URL', 'PGHOST', 'PGUSER', 'PGDATABASE'];
+    const missing = requiredVars.filter(name => !process.env[name]);
+    
+    if (missing.length > 0) {
+      throw new Error(
+        `Missing required database environment variables: ${missing.join(', ')}. Did you forget to provision a database?`
+      );
+    }
   }
 }
 
 // Validate environment variables before proceeding
 validateDbEnvironment();
 
-// Configuration parameters with reasonable defaults
-const dbConfig = {
+// Configuration for local PostgreSQL connection
+const localDbConfig = {
   connectionString: process.env.DATABASE_URL,
-  max: parseInt(process.env.DB_POOL_SIZE || '10'), // Maximum number of clients the pool should contain
-  idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT || '30000'), // Close idle clients after 30 seconds
-  connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT || '10000'), // Return an error after 10 seconds if connection not established
-  maxUses: parseInt(process.env.DB_MAX_USES || '7500'), // Close a connection after it has been used 7500 times (helps prevent memory leaks)
+  ssl: false, // Local PostgreSQL typically doesn't use SSL
+  max: parseInt(process.env.DB_POOL_SIZE || '10'),
+  idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT || '30000'),
+  connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT || '10000')
 };
 
-// Create connection pool with better error handling and reconnection
-export const pool = new Pool(dbConfig);
+let pool;
+
+if (isLocal) {
+  // Local PostgreSQL connection
+  pool = new Pool(localDbConfig);
+  console.log('Using local PostgreSQL database connection');
+} else {
+  // Replit environment using Neon Serverless
+  const { Pool: NeonPool, neonConfig } = require('@neondatabase/serverless');
+  const ws = require('ws');
+  
+  // Configure Neon database to use WebSocket for connection
+  neonConfig.webSocketConstructor = ws;
+  neonConfig.useSecureWebSocket = true;
+  
+  pool = new NeonPool({ 
+    connectionString: process.env.DATABASE_URL,
+    max: parseInt(process.env.DB_POOL_SIZE || '10')
+  });
+  console.log('Using Neon Serverless database connection');
+}
 
 // State variables for connection management
 let isReconnecting = false;
@@ -49,18 +67,22 @@ const MAX_RECONNECT_ATTEMPTS = 10;
 const RECONNECT_INTERVAL = 5000; // 5 seconds
 
 // Log pool events
-pool.on('connect', (client) => {
+pool.on('connect', () => {
   console.log('New database connection established');
   reconnectAttempts = 0; // Reset reconnect counter on successful connection
 });
 
 // Log pool errors rather than crashing
-pool.on('error', async (err) => {
-  console.error('Unexpected error on idle database client', err);
+pool.on('error', async (error) => {
+  console.error('Unexpected error on idle database client', error);
   
-  // Only attempt reconnection if we're not already trying
-  if (!isReconnecting) {
-    await attemptReconnection();
+  if (isLocal) {
+    console.error('Check your PostgreSQL configuration and make sure the service is running');
+  } else {
+    // Only attempt reconnection if we're not already trying
+    if (!isReconnecting) {
+      await attemptReconnection();
+    }
   }
 });
 
@@ -98,7 +120,9 @@ async function attemptReconnection() {
 }
 
 // Create Drizzle ORM instance with the pool
-export const db = drizzle({ client: pool, schema });
+export const db = isLocal
+  ? drizzle(pool, { schema }) // Standard PostgreSQL connection
+  : drizzle({ client: pool, schema }); // Neon serverless connection
 
 // Function to get pool status
 export function getPoolStatus() {

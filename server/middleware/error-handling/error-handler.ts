@@ -31,27 +31,26 @@ export function asyncHandler(fn: Function) {
  * Handles different types of errors and returns appropriate responses
  */
 export function errorHandler(err: Error | ApiError, req: Request, res: Response, _next: NextFunction) {
-  // Extract common properties to log
-  const logContext: Record<string, any> = {
-    errorMessage: err.message,
-    errorStack: err.stack,
-    requestPath: req.path,
-    requestMethod: req.method
-  };
-  
   // Log the error based on type
   if (err instanceof ApiError) {
-    // Add ApiError specific properties
-    logContext.statusCode = err.statusCode;
-    logContext.errorCode = err.errorCode;
-    
+    // For API errors, include status code and error code in message
     if (err.statusCode >= 500) {
-      logger.error('Server error', logContext);
+      const message = `Server error: ${err.message} [${err.statusCode}]`;
+      logger.error(message, err);
     } else {
-      logger.warn('Client error', logContext);
+      const message = `Client error: ${err.message} [${err.statusCode}]`;
+      logger.warn(message, { 
+        path: req.path, 
+        method: req.method
+      });
     }
   } else {
-    logger.error('Unhandled error', logContext);
+    // For standard errors, just log the error with request info
+    const message = `Unhandled error: ${err.message}`;
+    logger.error(message, err, { 
+      path: req.path, 
+      method: req.method 
+    });
   }
 
   // Handle ApiError (our custom error type)
