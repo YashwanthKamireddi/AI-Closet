@@ -5,10 +5,16 @@
  * in local development mode, checking prerequisites and handling common issues.
  */
 
-const { execSync, spawn } = require('child_process');
-const fs = require('fs');
-const path = require('path');
-const readline = require('readline');
+import { execSync, spawn } from 'child_process';
+import fs from 'fs';
+import { dirname, join } from 'path';
+import readline from 'readline';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+// Get current file and directory paths (ES module equivalent to __dirname)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Create readline interface for user input
 const rl = readline.createInterface({

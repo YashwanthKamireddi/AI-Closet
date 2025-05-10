@@ -12,12 +12,19 @@
  */
 
 // Load environment variables from .env file
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Import modules
-const { Client } = require('pg');
-const fs = require('fs');
-const path = require('path');
+import pg from 'pg';
+const { Client } = pg;
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import fs from 'fs';
+
+// Get current file and directory paths (ES module equivalent to __dirname)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // ANSI color codes for terminal output
 const colors = {

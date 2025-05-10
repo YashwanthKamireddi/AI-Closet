@@ -11,9 +11,14 @@
  * --default  Creates a .env file with default settings for quick setup
  */
 
-const fs = require('fs');
-const path = require('path');
-const readline = require('readline');
+import fs from 'fs';
+import { dirname, join } from 'path';
+import readline from 'readline';
+import { fileURLToPath } from 'url';
+
+// Get current file and directory paths (ES module equivalent to __dirname)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // ANSI color codes for terminal output
 const colors = {
@@ -57,7 +62,7 @@ async function generateEnvFile() {
   print('');
   
   // Check if .env already exists
-  const envFilePath = path.join(__dirname, '..', '.env');
+  const envFilePath = join(__dirname, '..', '.env');
   
   if (fs.existsSync(envFilePath)) {
     if (!useDefaults) {
@@ -152,7 +157,7 @@ DB_CONNECTION_TIMEOUT=10000
     // Next steps
     print('');
     print("Next steps:", 'blue');
-    if (!fs.existsSync(path.join(__dirname, '..', 'node_modules'))) {
+    if (!fs.existsSync(join(__dirname, '..', 'node_modules'))) {
       print("1. Run 'npm install' to install dependencies", 'cyan');
       print("2. Run 'npm run db:push' to create database tables", 'cyan');
       print("3. Run 'npm run dev' to start the application", 'cyan');
