@@ -740,9 +740,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           wardrobeItems: wardrobeItems,
           weatherCondition: weather ? {
             temperature: weather.temperature,
-            condition: weather.type,
-            humidity: weather.humidity,
-            precipitation: 0
+            condition: weather.type
           } : undefined
         });
         

@@ -54,6 +54,7 @@ export async function createApp(): Promise<Express> {
   // Connect session to database if available
   if (database.pool) {
     const PgStore = connectPgSimpleModule(session);
+    // @ts-ignore - The Pool type from Neon is compatible with pg-simple but TypeScript doesn't recognize it
     sessionConfig.store = new PgStore({ pool: database.pool });
   }
   
