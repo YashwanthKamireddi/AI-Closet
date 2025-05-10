@@ -2,6 +2,8 @@
 
 This comprehensive guide will walk you through setting up and running the Cher's Closet wardrobe management application on your local machine using Visual Studio Code. This guide is designed specifically for users who are not experienced with coding.
 
+![Local Setup Overview](./local-setup-diagram.svg)
+
 ## Table of Contents
 
 1. [Installing Required Software](#1-installing-required-software)
@@ -115,10 +117,38 @@ OPENAI_API_KEY=
    ```
    npm run db:push
    ```
-2. This command will create all necessary tables in your PostgreSQL database
+2. This command will create all necessary tables in your PostgreSQL database:
+   - `users`: User accounts and authentication
+   - `wardrobe_items`: Individual clothing items in a user's wardrobe
+   - `outfits`: Combinations of clothing items created by users
+   - `inspirations`: Fashion inspiration content
+   - `weather_preferences`: User preferences for clothing based on weather
+   - `mood_preferences`: User preferences for clothing based on emotional states
+
 3. If successful, you'll see output indicating the tables were created
 
+For more detailed information about the database structure and relationships, see the Database Structure section in SETUP.md.
+
 ## 8. Running the Application
+
+### Option 1: Using the Interactive Local Startup Script (Recommended for Beginners)
+
+1. In the VS Code terminal, run:
+   ```
+   node start-local.js
+   ```
+2. This script will:
+   - Check if you have a `.env` file and help you create one if needed
+   - Install dependencies if they're not already installed
+   - Check if database tables exist and create them if needed
+   - Start the development server automatically
+
+3. Open your web browser and navigate to `http://localhost:3000`
+4. You should now see the Cher's Closet application running
+
+### Option 2: Standard Startup
+
+If you prefer to run the application directly:
 
 1. In the VS Code terminal, run:
    ```
@@ -126,7 +156,6 @@ OPENAI_API_KEY=
    ```
 2. The application will start and display a message showing the URL
 3. Open your web browser and navigate to `http://localhost:3000`
-4. You should now see the Cher's Closet application running
 
 ## 9. Using the Application
 
@@ -141,16 +170,27 @@ OPENAI_API_KEY=
 
 If you see errors connecting to the database:
 
-1. **Check PostgreSQL Service**:
+1. **Run the Database Check Script**:
+   ```
+   node scripts/check-database.js
+   ```
+   This script will:
+   - Verify your environment variables are set correctly
+   - Test the database connection
+   - Check if required tables exist
+   - Show record counts for each table
+   - Provide detailed error messages with suggestions
+
+2. **Check PostgreSQL Service**:
    - Windows: Open Services app and make sure PostgreSQL service is running
    - Mac/Linux: Run `sudo service postgresql status` or `brew services list` if using Homebrew
 
-2. **Verify Connection Settings**:
+3. **Verify Connection Settings**:
    - Double-check the values in your `.env` file
    - Make sure the password is correct
    - Try connecting with pgAdmin to verify credentials
 
-3. **PostgreSQL Authentication**:
+4. **PostgreSQL Authentication**:
    - If you get a "peer authentication" error on Linux, you may need to edit PostgreSQL's `pg_hba.conf` file to use "md5" authentication instead of "peer" for local connections
 
 ### Application Won't Start
@@ -165,9 +205,22 @@ If the application fails to start:
    - If you see "port 3000 is already in use", another application is using that port
    - You can either close the other application or change the port by updating the scripts in `package.json`
 
-### Simplest Alternative: Using the Setup Script
+### Simplest Alternatives: Using Our Helper Scripts
 
-We've included a setup script that automates most of these steps:
+#### Option 1: Interactive Startup Script (Recommended)
+
+The easiest way to get started is using our interactive startup script:
+
+1. In the VS Code terminal, run:
+   ```
+   node start-local.js
+   ```
+2. Follow the prompts to set up your environment
+3. The script will automatically start the application when ready
+
+#### Option 2: Automated Setup Script
+
+We've also included a setup script that automates most of the configuration steps:
 
 1. In the VS Code terminal, make the script executable:
    ```

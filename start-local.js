@@ -39,9 +39,55 @@ function ask(question) {
   });
 }
 
+// Function to check database connection
+async function checkDatabase() {
+  log("Running database connection check...", 'info');
+  try {
+    // Execute the database check script
+    execSync('node scripts/check-database.js', { stdio: 'inherit' });
+    return true;
+  } catch (error) {
+    log("Database check failed. Please fix the issues above before starting the application.", 'error');
+    return false;
+  }
+}
+
 // Main function to run the application
 async function main() {
   log("Starting Cher's Closet in local development mode...");
+  
+  // Display menu for first-time users
+  console.log("\nWhat would you like to do?");
+  console.log("1. Start the application");
+  console.log("2. Check database connection");
+  console.log("3. Create/update .env file");
+  console.log("4. Exit");
+  
+  const choice = await ask("\nEnter your choice (1-4): ");
+  
+  if (choice === '2') {
+    await checkDatabase();
+    const restart = await ask("\nWould you like to return to the main menu? (y/n): ");
+    if (restart.toLowerCase() === 'y') {
+      return main();
+    } else {
+      rl.close();
+      return;
+    }
+  } else if (choice === '3') {
+    // Delete existing .env file if it exists
+    if (fs.existsSync(path.join(__dirname, '.env'))) {
+      fs.unlinkSync(path.join(__dirname, '.env'));
+    }
+    // Continue to .env file creation below
+  } else if (choice === '4') {
+    log("Exiting...", 'warning');
+    rl.close();
+    return;
+  } else if (choice !== '1') {
+    log("Invalid choice. Please try again.", 'warning');
+    return main();
+  }
   
   // Check for .env file
   if (!fs.existsSync(path.join(__dirname, '.env'))) {

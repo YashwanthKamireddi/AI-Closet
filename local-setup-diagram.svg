@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="500" fill="#f5f5f5" rx="10" ry="10"/>
+  
+  <!-- Title -->
+  <text x="400" y="40" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">Cher's Closet Local Setup Guide</text>
+  
+  <!-- Step 1: Install Software -->
+  <rect x="50" y="80" width="160" height="80" fill="#e1f5fe" stroke="#29b6f6" stroke-width="2" rx="5" ry="5"/>
+  <text x="130" y="110" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#01579b">Step 1</text>
+  <text x="130" y="135" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">Install Required Software</text>
+  
+  <!-- Step 2: Get the Code -->
+  <rect x="230" y="80" width="160" height="80" fill="#e8f5e9" stroke="#66bb6a" stroke-width="2" rx="5" ry="5"/>
+  <text x="310" y="110" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#1b5e20">Step 2</text>
+  <text x="310" y="135" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">Download Project</text>
+  
+  <!-- Step 3: Open in VS Code -->
+  <rect x="410" y="80" width="160" height="80" fill="#fff3e0" stroke="#ffa726" stroke-width="2" rx="5" ry="5"/>
+  <text x="490" y="110" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#e65100">Step 3</text>
+  <text x="490" y="135" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">Open in VS Code</text>
+  
+  <!-- Step 4: Create Database -->
+  <rect x="590" y="80" width="160" height="80" fill="#f3e5f5" stroke="#ba68c8" stroke-width="2" rx="5" ry="5"/>
+  <text x="670" y="110" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#4a148c">Step 4</text>
+  <text x="670" y="135" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">Create PostgreSQL DB</text>
+  
+  <!-- Step 5: Setup Environment -->
+  <rect x="50" y="180" width="160" height="80" fill="#e0f7fa" stroke="#26c6da" stroke-width="2" rx="5" ry="5"/>
+  <text x="130" y="210" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#006064">Step 5</text>
+  <text x="130" y="235" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">Setup .env File</text>
+  
+  <!-- Step 6: Install Dependencies -->
+  <rect x="230" y="180" width="160" height="80" fill="#f1f8e9" stroke="#aed581" stroke-width="2" rx="5" ry="5"/>
+  <text x="310" y="210" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#33691e">Step 6</text>
+  <text x="310" y="235" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">Install Dependencies</text>
+  
+  <!-- Step 7: Create Tables -->
+  <rect x="410" y="180" width="160" height="80" fill="#fffde7" stroke="#ffee58" stroke-width="2" rx="5" ry="5"/>
+  <text x="490" y="210" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#f57f17">Step 7</text>
+  <text x="490" y="235" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">Create Database Tables</text>
+  
+  <!-- Step 8: Run Application -->
+  <rect x="590" y="180" width="160" height="80" fill="#e8eaf6" stroke="#7986cb" stroke-width="2" rx="5" ry="5"/>
+  <text x="670" y="210" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#1a237e">Step 8</text>
+  <text x="670" y="235" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">Run the Application</text>
+  
+  <!-- Arrows -->
+  <path d="M210 120 L230 120" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M390 120 L410 120" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M570 120 L590 120" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M670 160 L670 180" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M590 220 L570 220" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M410 220 L390 220" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M230 220 L210 220" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M130 160 L130 180" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Arrow Definition -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+  </defs>
+  
+  <!-- The Simplest Way -->
+  <rect x="150" y="300" width="500" height="150" fill="#e3f2fd" stroke="#1976d2" stroke-width="3" rx="10" ry="10"/>
+  <text x="400" y="330" font-family="Arial" font-size="20" font-weight="bold" text-anchor="middle" fill="#0d47a1">Easiest Method: Use Our Helper Scripts</text>
+  
+  <!-- Option 1 -->
+  <rect x="180" y="350" width="200" height="80" fill="#bbdefb" stroke="#1976d2" stroke-width="2" rx="5" ry="5"/>
+  <text x="280" y="380" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#0d47a1">Option 1</text>
+  <text x="280" y="405" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">node start-local.js</text>
+  
+  <!-- Option 2 -->
+  <rect x="420" y="350" width="200" height="80" fill="#bbdefb" stroke="#1976d2" stroke-width="2" rx="5" ry="5"/>
+  <text x="520" y="380" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#0d47a1">Option 2</text>
+  <text x="520" y="405" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">./local-setup.sh</text>
+</svg>

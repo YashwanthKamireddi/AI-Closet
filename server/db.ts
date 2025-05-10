@@ -3,6 +3,13 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from "@shared/schema";
 import { sql } from 'drizzle-orm';
 
+// Type for pool status
+interface PoolStatus {
+  totalCount: number;
+  idleCount: number;
+  waitingCount: number;
+}
+
 // Determine if we're running in local mode or using Neon Serverless
 const isLocal = !process.env.REPL_ID;
 
@@ -38,7 +45,9 @@ const localDbConfig = {
   connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT || '10000')
 };
 
-let pool;
+// Define pool with proper typing
+// @ts-ignore - Dynamic typing for local vs. Neon Pool
+let pool: Pool;
 
 if (isLocal) {
   // Local PostgreSQL connection
@@ -73,7 +82,7 @@ pool.on('connect', () => {
 });
 
 // Log pool errors rather than crashing
-pool.on('error', async (error) => {
+pool.on('error', async (error: any) => {
   console.error('Unexpected error on idle database client', error);
   
   if (isLocal) {
@@ -87,7 +96,7 @@ pool.on('error', async (error) => {
 });
 
 // Helper function to attempt database reconnection
-async function attemptReconnection() {
+async function attemptReconnection(): Promise<void> {
   isReconnecting = true;
   reconnectAttempts++;
   
@@ -95,6 +104,7 @@ async function attemptReconnection() {
   
   try {
     // Test the connection
+    // @ts-ignore - Pool connect method may not be fully typed
     const client = await pool.connect();
     await client.query('SELECT 1');
     client.release();
@@ -125,20 +135,22 @@ export const db = isLocal
   : drizzle({ client: pool, schema }); // Neon serverless connection
 
 // Function to get pool status
-export function getPoolStatus() {
+export function getPoolStatus(): PoolStatus {
+  // @ts-ignore - Pool stats may not be fully typed
   return {
-    totalCount: pool.totalCount,
-    idleCount: pool.idleCount,
-    waitingCount: pool.waitingCount
+    totalCount: pool.totalCount || 0,
+    idleCount: pool.idleCount || 0,
+    waitingCount: pool.waitingCount || 0
   };
 }
 
 // Function to test database connection with retry logic
-export async function testDatabaseConnection(retries = 3, delay = 1000) {
+export async function testDatabaseConnection(retries = 3, delay = 1000): Promise<boolean> {
   let attempt = 0;
   
   while (attempt < retries) {
     try {
+      // @ts-ignore - Pool connect method may not be fully typed
       const client = await pool.connect();
       const result = await client.query('SELECT 1 AS ping');
       client.release();

@@ -1,145 +1,196 @@
 #!/bin/bash
+# Cher's Closet Local Setup Script
+# This script helps set up the local development environment
 
-# Text formatting
-BOLD='\033[1m'
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-YELLOW='\033[0;33m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
-
-# Helper functions
-print_step() {
-  echo -e "\n${BOLD}${BLUE}STEP $1: $2${NC}\n"
+# Function for colored output
+print_color() {
+  COLOR=$1
+  MESSAGE=$2
+  case $COLOR in
+    "red") echo -e "\033[0;31m$MESSAGE\033[0m" ;;
+    "green") echo -e "\033[0;32m$MESSAGE\033[0m" ;;
+    "yellow") echo -e "\033[0;33m$MESSAGE\033[0m" ;;
+    "blue") echo -e "\033[0;34m$MESSAGE\033[0m" ;;
+    "magenta") echo -e "\033[0;35m$MESSAGE\033[0m" ;;
+    "cyan") echo -e "\033[0;36m$MESSAGE\033[0m" ;;
+    *) echo "$MESSAGE" ;;
+  esac
 }
 
-print_success() {
-  echo -e "${GREEN}✓ $1${NC}"
+# Function to check if a command exists
+command_exists() {
+  command -v "$1" >/dev/null 2>&1
 }
 
-print_warning() {
-  echo -e "${YELLOW}⚠️ $1${NC}"
-}
-
-print_error() {
-  echo -e "${RED}❌ $1${NC}"
-}
+# Clear the terminal
+clear
 
 # Display welcome message
-clear
-echo -e "${BOLD}${GREEN}==================================${NC}"
-echo -e "${BOLD}${GREEN}  Cher's Closet - Local Setup   ${NC}"
-echo -e "${BOLD}${GREEN}==================================${NC}\n"
-echo -e "This script will help you set up the Cher's Closet application to run locally on your machine.\n"
+print_color "magenta" "====================================================="
+print_color "magenta" "      Cher's Closet Local Development Setup"
+print_color "magenta" "====================================================="
+echo ""
+print_color "cyan" "This script will help you set up the local development environment"
+print_color "cyan" "for the Cher's Closet wardrobe management application."
+echo ""
 
-# Step 1: Check prerequisites
-print_step "1" "Checking prerequisites"
+# Check prerequisites
+print_color "blue" "Checking prerequisites..."
 
-# Check Node.js
-if command -v node &> /dev/null; then
+# Check for Node.js
+if command_exists node; then
   NODE_VERSION=$(node -v)
-  print_success "Node.js is installed: $NODE_VERSION"
+  print_color "green" "✓ Node.js found: $NODE_VERSION"
 else
-  print_error "Node.js is not installed. Please install Node.js v18 or later from https://nodejs.org/"
+  print_color "red" "✗ Node.js not found. Please install Node.js v18 or later."
+  print_color "yellow" "Visit: https://nodejs.org/"
   exit 1
 fi
 
-# Check npm
-if command -v npm &> /dev/null; then
+# Check for npm
+if command_exists npm; then
   NPM_VERSION=$(npm -v)
-  print_success "npm is installed: $NPM_VERSION"
+  print_color "green" "✓ npm found: $NPM_VERSION"
 else
-  print_error "npm is not installed. It should be included with Node.js installation."
+  print_color "red" "✗ npm not found. Please install npm."
   exit 1
 fi
 
-# Check PostgreSQL
-if command -v psql &> /dev/null; then
+# Check for PostgreSQL
+if command_exists psql; then
   PSQL_VERSION=$(psql --version)
-  print_success "PostgreSQL is installed: $PSQL_VERSION"
+  print_color "green" "✓ PostgreSQL found: $PSQL_VERSION"
 else
-  print_error "PostgreSQL is not installed. Please install PostgreSQL from https://www.postgresql.org/download/"
-  exit 1
+  print_color "red" "✗ PostgreSQL not found."
+  print_color "yellow" "Please install PostgreSQL from: https://www.postgresql.org/download/"
+  print_color "yellow" "Continue anyway? [y/N]"
+  read -r CONTINUE
+  if [[ ! "$CONTINUE" =~ ^[Yy]$ ]]; then
+    exit 1
+  fi
 fi
 
-# Step 2: Setup environment file
-print_step "2" "Setting up environment file"
+# Create .env file if it doesn't exist
+echo ""
+print_color "blue" "Setting up environment variables..."
 
 if [ -f .env ]; then
-  print_warning "An .env file already exists. Do you want to overwrite it? (y/n)"
-  read -r overwrite
-  if [[ $overwrite != "y" ]]; then
-    print_warning "Skipping .env file creation"
+  print_color "yellow" "A .env file already exists. Do you want to overwrite it? [y/N]"
+  read -r OVERWRITE
+  if [[ "$OVERWRITE" =~ ^[Yy]$ ]]; then
+    rm .env
   else
-    create_env=true
+    print_color "green" "✓ Using existing .env file"
+  fi
+fi
+
+if [ ! -f .env ]; then
+  print_color "yellow" "PostgreSQL Database Configuration:"
+  
+  # Database connection details
+  echo -n "Enter PostgreSQL host (default: localhost): "
+  read -r DB_HOST
+  DB_HOST=${DB_HOST:-localhost}
+  
+  echo -n "Enter PostgreSQL port (default: 5432): "
+  read -r DB_PORT
+  DB_PORT=${DB_PORT:-5432}
+  
+  echo -n "Enter PostgreSQL username (default: postgres): "
+  read -r DB_USER
+  DB_USER=${DB_USER:-postgres}
+  
+  echo -n "Enter PostgreSQL password: "
+  read -rs DB_PASSWORD
+  echo ""
+  
+  echo -n "Enter database name (default: chers_closet): "
+  read -r DB_NAME
+  DB_NAME=${DB_NAME:-chers_closet}
+  
+  # Optional OpenAI API key
+  echo ""
+  print_color "yellow" "Would you like to set up an OpenAI API key for AI features? [y/N]"
+  read -r SETUP_OPENAI
+  if [[ "$SETUP_OPENAI" =~ ^[Yy]$ ]]; then
+    echo -n "Enter your OpenAI API key: "
+    read -rs OPENAI_API_KEY
+    echo ""
+  else
+    OPENAI_API_KEY=""
+  fi
+  
+  # Create the .env file
+  cat > .env << EOF
+# Database connection
+DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
+PGHOST=${DB_HOST}
+PGPORT=${DB_PORT}
+PGUSER=${DB_USER}
+PGPASSWORD=${DB_PASSWORD}
+PGDATABASE=${DB_NAME}
+
+# OpenAI API key (optional, for AI features)
+OPENAI_API_KEY=${OPENAI_API_KEY}
+EOF
+  
+  print_color "green" "✓ Environment variables set up in .env file"
+  
+  # Create the database if it doesn't exist
+  print_color "yellow" "Do you want to create the database '$DB_NAME'? [Y/n]"
+  read -r CREATE_DB
+  if [[ ! "$CREATE_DB" =~ ^[Nn]$ ]]; then
+    print_color "blue" "Creating database..."
+    if command_exists psql; then
+      export PGPASSWORD=$DB_PASSWORD
+      psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -c "CREATE DATABASE $DB_NAME" 2>/dev/null
+      RESULT=$?
+      if [ $RESULT -eq 0 ]; then
+        print_color "green" "✓ Database created successfully"
+      else
+        print_color "yellow" "⚠ Could not create database. It may already exist or there might be a connection issue."
+      fi
+    else
+      print_color "yellow" "⚠ PostgreSQL client not found. Please create the database manually."
+    fi
+  fi
+fi
+
+# Install dependencies
+echo ""
+print_color "blue" "Installing dependencies..."
+if [ -d "node_modules" ]; then
+  print_color "yellow" "node_modules already exists. Do you want to reinstall dependencies? [y/N]"
+  read -r REINSTALL
+  if [[ "$REINSTALL" =~ ^[Yy]$ ]]; then
+    npm install
+  else
+    print_color "green" "✓ Using existing dependencies"
   fi
 else
-  create_env=true
+  npm install
 fi
 
-if [[ $create_env == true ]]; then
-  echo -e "We need to set up your local PostgreSQL database connection."
-  echo -e "Please enter your PostgreSQL credentials:\n"
-  
-  read -p "PostgreSQL hostname [localhost]: " db_host
-  db_host=${db_host:-localhost}
-  
-  read -p "PostgreSQL port [5432]: " db_port
-  db_port=${db_port:-5432}
-  
-  read -p "PostgreSQL username [postgres]: " db_user
-  db_user=${db_user:-postgres}
-  
-  read -p "PostgreSQL password: " db_password
-  
-  read -p "PostgreSQL database name [chers_closet]: " db_name
-  db_name=${db_name:-chers_closet}
-  
-  echo -e "# Database connection" > .env
-  echo -e "DATABASE_URL=postgres://$db_user:$db_password@$db_host:$db_port/$db_name" >> .env
-  echo -e "PGHOST=$db_host" >> .env
-  echo -e "PGPORT=$db_port" >> .env
-  echo -e "PGUSER=$db_user" >> .env
-  echo -e "PGPASSWORD=$db_password" >> .env
-  echo -e "PGDATABASE=$db_name" >> .env
-  echo -e "\n# OpenAI API key (optional, for AI features)" >> .env
-  echo -e "# Get one from https://platform.openai.com/account/api-keys" >> .env
-  echo -e "OPENAI_API_KEY=" >> .env
-  
-  print_success "Created .env file with database configuration"
+# Create database tables
+echo ""
+print_color "blue" "Setting up database schema..."
+print_color "yellow" "Do you want to create the database tables? [Y/n]"
+read -r CREATE_TABLES
+if [[ ! "$CREATE_TABLES" =~ ^[Nn]$ ]]; then
+  npm run db:push
 fi
 
-# Step 3: Install dependencies
-print_step "3" "Installing dependencies"
-npm install
-print_success "Dependencies installed"
-
-# Step 4: Set up database
-print_step "4" "Setting up database"
-
-# Check if database exists
-DB_EXISTS=$(PGPASSWORD=$db_password psql -h $db_host -p $db_port -U $db_user -tAc "SELECT 1 FROM pg_database WHERE datname='$db_name'" postgres)
-
-if [ "$DB_EXISTS" != "1" ]; then
-  echo "Creating database $db_name..."
-  PGPASSWORD=$db_password psql -h $db_host -p $db_port -U $db_user -c "CREATE DATABASE $db_name;" postgres
-  print_success "Database $db_name created"
-else
-  print_success "Database $db_name already exists"
-fi
-
-# Create tables using Drizzle
-echo "Creating database tables..."
-npm run db:push
-print_success "Database schema created"
-
-# Step 5: Running the application
-print_step "5" "Starting the application"
-echo -e "Your Cher's Closet application is now set up and ready to run!\n"
-echo -e "To start the application, run: ${BOLD}npm run dev${NC}"
-echo -e "The application will be available at: ${BOLD}http://localhost:3000${NC}\n"
-
-# Done
-echo -e "${BOLD}${GREEN}==================================${NC}"
-echo -e "${BOLD}${GREEN}      Setup Complete! 🎉         ${NC}"
-echo -e "${BOLD}${GREEN}==================================${NC}\n"
+# Setup complete
+echo ""
+print_color "magenta" "====================================================="
+print_color "green" "      Cher's Closet setup completed successfully!"
+print_color "magenta" "====================================================="
+echo ""
+print_color "cyan" "You can now start the application by running:"
+print_color "cyan" "  npm run dev"
+echo ""
+print_color "yellow" "Or use our simpler interactive script:"
+print_color "yellow" "  node start-local.js"
+echo ""
+print_color "blue" "For more information, see VSCODE_GUIDE.md"
+echo ""

@@ -39,26 +39,60 @@ The following environment variables need to be set:
    - Run `node start.cjs` in the terminal
    - Run `chmod +x run.sh && ./run.sh` in the terminal
 
-### Running Locally
+### Running Locally with VS Code (Detailed Instructions)
 
-To run the application on your local machine:
+For detailed step-by-step instructions on how to run the application locally with VS Code and PostgreSQL, please see the `VSCODE_GUIDE.md` file included in this repository.
 
-1. Clone the repository
-2. Create a `.env` file with the necessary environment variables
-3. Install dependencies: `npm install`
-4. Create the database tables: `npm run db:push`
-5. Start the development server: `npm run dev`
+We've created helper scripts to make local setup easy, even if you're not experienced with coding:
+
+1. Interactive Setup and Run Script: `node start-local.js`
+   - Guides you through setup with interactive prompts
+   - Creates environment files, database, and tables automatically
+   - Starts the application when everything is ready
+
+2. Automated Setup Script: `./local-setup.sh`
+   - Automates environment setup
+   - Configures PostgreSQL connection
+   - Prepares everything for you to run the app with `npm run dev`
 
 ## Database Structure
 
 The application uses the following database tables:
 
 - `users`: User accounts and authentication
+  - Fields: id, username, password, name, email, profilePicture, role
+  - Primary entity that all personal data relates to
+
 - `wardrobe_items`: Individual clothing items in a user's wardrobe
+  - Fields: id, userId, name, category, subcategory, color, season, imageUrl, tags, favorite
+  - Foundation for outfit creation and recommendations
+
 - `outfits`: Combinations of clothing items created by users
+  - Fields: id, userId, name, description, items (array of wardrobe item IDs), occasion, season, favorite, weatherConditions, mood
+  - Enables outfit planning, sharing, and intelligent recommendations
+
 - `inspirations`: Fashion inspiration content
+  - Fields: id, title, description, imageUrl, tags, category, source, content
+  - Provides styling ideas and trend information for all users
+
 - `weather_preferences`: User preferences for clothing based on weather
-- `mood_preferences`: User preferences for clothing based on mood
+  - Fields: id, userId, weatherType, preferredCategories (array)
+  - Enables weather-aware outfit recommendations 
+
+- `mood_preferences`: User preferences for clothing based on emotional states
+  - Fields: id, userId, mood, preferredCategories (array), preferredColors (array)
+  - Powers emotionally intelligent styling suggestions
+
+### Database Relationships:
+
+- Users ← Wardrobe Items (one-to-many)
+- Users ← Outfits (one-to-many)
+- Wardrobe Items ← Outfits (many-to-many via items array)
+- Users ← Weather Preferences (one-to-many)
+- Users ← Mood Preferences (one-to-many)
+- Inspirations (standalone, accessible by all users)
+
+The database schema is defined in `shared/schema.ts`. When changes are made to the schema, run `npm run db:push` to apply changes.
 
 ## Features
 
